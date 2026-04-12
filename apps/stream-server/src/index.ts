@@ -5,10 +5,13 @@ import { rootLogger } from './logger.js';
 import { installAuthMiddleware } from './middleware/auth.js';
 import { attachSessionRouter } from './session-router.js';
 import { InMemorySessionStore, type SessionStore } from './session-store.js';
+import { RedisSessionStore } from './session-store.redis.js';
 
 async function main(): Promise<void> {
   const config = loadConfig();
-  const store: SessionStore = new InMemorySessionStore();
+  const store: SessionStore = config.redisUrl
+    ? RedisSessionStore.connect(config.redisUrl)
+    : new InMemorySessionStore();
 
   let activeSessions = 0;
   const http = buildHttpApp(config, store, () => activeSessions);
