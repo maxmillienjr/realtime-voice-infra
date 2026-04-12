@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "stream-server-metrics": {
+      "command": "node",
+      "args": ["./mcp-config/stubs/metrics-server.js"],
+      "env": {
+        "STREAM_SERVER_URL": "http://localhost:3000"
+      }
+    }
+  }
+}
