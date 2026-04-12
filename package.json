@@ -1,0 +1,32 @@
+{
+  "name": "realtime-voice-infra",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Production-grade transport layer for voice agents.",
+  "license": "MIT",
+  "packageManager": "yarn@4.4.0",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "scripts": {
+    "build": "yarn workspaces foreach -Apt run build",
+    "test": "yarn workspaces foreach -Apt run test",
+    "lint": "eslint . --ext .ts,.tsx",
+    "typecheck": "yarn workspaces foreach -Apt run typecheck",
+    "format": "prettier --write ."
+  },
+  "devDependencies": {
+    "@types/node": "^20.12.0",
+    "@typescript-eslint/eslint-plugin": "^7.8.0",
+    "@typescript-eslint/parser": "^7.8.0",
+    "eslint": "^8.57.0",
+    "eslint-config-prettier": "^9.1.0",
+    "prettier": "^3.2.5",
+    "typescript": "^5.4.5",
+    "vitest": "^1.6.0"
+  }
+}
