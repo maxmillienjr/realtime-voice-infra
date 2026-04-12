@@ -1,0 +1,40 @@
+name: e2e
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  playwright:
+    runs-on: ubuntu-latest
+    services:
+      redis:
+        image: redis:7-alpine
+        ports: ['6379:6379']
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: yarn
+      - run: corepack enable
+      - run: yarn install --immutable
+      - run: yarn build
+      - run: yarn workspace @realtime-voice-infra/stream-server start &
+        env:
+          REDIS_URL: redis://localhost:6379
+          JWT_SECRET: ci-secret-at-least-32-bytes-long-xxxxxxx
+      - run: yarn workspace @realtime-voice-infra/voice-client start &
+      - name: wait for servers
+        run: npx wait-on http://localhost:3000/healthz http://localhost:4200
+      - name: install playwright
+        run: npx playwright install --with-deps chromium
+      - name: run e2e
+        run: npx playwright test
