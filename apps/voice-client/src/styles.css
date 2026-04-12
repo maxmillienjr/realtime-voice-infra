@@ -1,0 +1,22 @@
+body {
+  font-family: system-ui, sans-serif;
+  margin: 0;
+  padding: 2rem;
+  background: #0b0d12;
+  color: #e7ecf4;
+}
+
+button {
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.status {
+  font-family: ui-monospace, monospace;
+  margin: 1rem 0;
+}
+
+.error {
+  color: #ff6b6b;
+}

@@ -1,0 +1,33 @@
+{
+  "name": "@realtime-voice-infra/voice-client",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "build": "ng build",
+    "start": "ng serve --host 0.0.0.0 --port 4200",
+    "typecheck": "tsc --noEmit -p tsconfig.app.json",
+    "test": "echo 'voice-client tests run via playwright in e2e workflow'"
+  },
+  "dependencies": {
+    "@angular/animations": "^21.0.0",
+    "@angular/common": "^21.0.0",
+    "@angular/compiler": "^21.0.0",
+    "@angular/core": "^21.0.0",
+    "@angular/forms": "^21.0.0",
+    "@angular/platform-browser": "^21.0.0",
+    "@angular/platform-browser-dynamic": "^21.0.0",
+    "@realtime-voice-infra/audio-codec": "workspace:*",
+    "@realtime-voice-infra/session-core": "workspace:*",
+    "@realtime-voice-infra/shared-types": "workspace:*",
+    "rxjs": "~7.8.0",
+    "socket.io-client": "^4.7.5",
+    "tslib": "^2.6.0",
+    "zone.js": "~0.14.0"
+  },
+  "devDependencies": {
+    "@angular/build": "^21.0.0",
+    "@angular/cli": "^21.0.0",
+    "@angular/compiler-cli": "^21.0.0",
+    "typescript": "^5.4.5"
+  }
+}
