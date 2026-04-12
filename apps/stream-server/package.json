@@ -1,0 +1,31 @@
+{
+  "name": "@realtime-voice-infra/stream-server",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc --noEmit",
+    "start": "node dist/index.js",
+    "dev": "node --import tsx/esm src/index.ts",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@realtime-voice-infra/audio-codec": "workspace:*",
+    "@realtime-voice-infra/session-core": "workspace:*",
+    "@realtime-voice-infra/shared-types": "workspace:*",
+    "fastify": "^4.27.0",
+    "ioredis": "^5.4.1",
+    "pino": "^9.1.0",
+    "socket.io": "^4.7.5",
+    "zod": "^3.23.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.12.0",
+    "socket.io-client": "^4.7.5",
+    "tsx": "^4.10.0",
+    "typescript": "^5.4.5",
+    "vitest": "^1.6.0"
+  }
+}
