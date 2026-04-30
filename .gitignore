@@ -19,3 +19,5 @@ coverage/
 *.tsbuildinfo
 playwright-report/
 test-results/
+summary.json
+server-logs.txt
