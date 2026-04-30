@@ -6,23 +6,35 @@ on:
     - cron: '0 7 * * 1'
 
 jobs:
-  k6:
+  backpressure:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: enable yarn
+        run: corepack enable && corepack prepare yarn@4.4.0 --activate
+      - name: install deps
+        run: yarn install
       - name: bring up stack
-        run: docker compose up -d --wait
-      - name: install k6
-        run: |
-          sudo gpg -k
-          sudo gpg --no-default-keyring --keyring /usr/share/keyrings/k6-archive-keyring.gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys C5AD17C747E3415A3642D57D77C6C491D6AC1D69
-          echo "deb [signed-by=/usr/share/keyrings/k6-archive-keyring.gpg] https://dl.k6.io/deb stable main" | sudo tee /etc/apt/sources.list.d/k6.list
-          sudo apt-get update && sudo apt-get install -y k6
-      - run: k6 run scripts/load/backpressure.js --vus 100 --duration 60s
+        run: docker compose up -d --wait --build
+      - name: run load test
+        run: yarn workspace @realtime-voice-infra/stream-server exec tsx scripts/load-backpressure.ts
         env:
           STREAM_SERVER_URL: http://localhost:3000
+          REDIS_URL: redis://localhost:6379
+          VUS: '100'
+          DURATION_S: '60'
+          FRAMES_PER_SECOND: '50'
+          SUMMARY_PATH: ${{ github.workspace }}/summary.json
+      - name: dump server logs
+        if: failure()
+        run: docker compose logs stream-server redis > server-logs.txt
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: k6-summary
-          path: summary.json
+          name: load-summary
+          path: |
+            summary.json
+            server-logs.txt
