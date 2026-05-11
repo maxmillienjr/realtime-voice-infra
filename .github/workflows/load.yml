@@ -17,6 +17,8 @@ jobs:
         run: corepack enable && corepack prepare yarn@4.13.0 --activate
       - name: install deps
         run: yarn install
+      - name: build workspaces
+        run: yarn build
       - name: bring up stack
         run: docker compose up -d --wait --build
       - name: run load test
