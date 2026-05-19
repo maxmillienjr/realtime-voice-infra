@@ -3,7 +3,7 @@
 Production-grade transport layer for voice agents: AudioWorklet capture,
 backpressure-aware Socket.io streaming, and session-scoped encryption.
 
-![ci](https://img.shields.io/github/actions/workflow/status/maxathy/realtime-voice-infra/ci.yml?branch=main)
+![ci](https://img.shields.io/github/actions/workflow/status/maxmillienjr/realtime-voice-infra/ci.yml?branch=main)
 ![license](https://img.shields.io/badge/license-MIT-blue.svg)
 
 Voice-AI teams routinely under-invest in the transport layer — treating it as
