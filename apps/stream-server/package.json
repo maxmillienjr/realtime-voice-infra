@@ -15,7 +15,7 @@
     "@realtime-voice-infra/audio-codec": "workspace:*",
     "@realtime-voice-infra/session-core": "workspace:*",
     "@realtime-voice-infra/shared-types": "workspace:*",
-    "fastify": "^4.27.0",
+    "fastify": "^5.10.0",
     "ioredis": "^5.4.1",
     "pino": "^9.1.0",
     "socket.io": "^4.7.5",
@@ -26,6 +26,6 @@
     "socket.io-client": "^4.7.5",
     "tsx": "^4.10.0",
     "typescript": "^5.4.5",
-    "vitest": "^1.6.0"
+    "vitest": "^3.2.7"
   }
 }

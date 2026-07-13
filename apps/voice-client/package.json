@@ -9,13 +9,13 @@
     "test": "echo 'voice-client tests run via playwright in e2e workflow'"
   },
   "dependencies": {
-    "@angular/animations": "^21.0.0",
-    "@angular/common": "^21.0.0",
-    "@angular/compiler": "^21.0.0",
-    "@angular/core": "^21.0.0",
-    "@angular/forms": "^21.0.0",
-    "@angular/platform-browser": "^21.0.0",
-    "@angular/platform-browser-dynamic": "^21.0.0",
+    "@angular/animations": "^21.2.18",
+    "@angular/common": "^21.2.18",
+    "@angular/compiler": "^21.2.18",
+    "@angular/core": "^21.2.18",
+    "@angular/forms": "^21.2.18",
+    "@angular/platform-browser": "^21.2.18",
+    "@angular/platform-browser-dynamic": "^21.2.18",
     "@realtime-voice-infra/audio-codec": "workspace:*",
     "@realtime-voice-infra/session-core": "workspace:*",
     "@realtime-voice-infra/shared-types": "workspace:*",
@@ -25,9 +25,9 @@
     "zone.js": "~0.14.0"
   },
   "devDependencies": {
-    "@angular/build": "^21.0.0",
-    "@angular/cli": "^21.0.0",
-    "@angular/compiler-cli": "^21.0.0",
+    "@angular/build": "^21.2.18",
+    "@angular/cli": "^21.2.18",
+    "@angular/compiler-cli": "^21.2.18",
     "typescript": "^5.4.5"
   }
 }
