@@ -1,0 +1,41 @@
+name: Security
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+  schedule:
+    - cron: '0 6 * * 1' # Weekly on Mondays at 06:00 UTC
+
+permissions:
+  contents: read
+
+jobs:
+  dependency-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Install dependencies
+        run: yarn install --immutable
+
+      # The pull_request trigger catches an advisory a PR introduces. The
+      # schedule is what catches an advisory published against dependencies
+      # that never changed, which is how 19 of them accumulated here unseen.
+      #
+      # This also guards the scoped `node-gyp/undici` resolution in
+      # package.json. Yarn's parent/child resolutions only bind when the
+      # child is a direct dependency of the parent, and when they stop
+      # matching they are ignored silently: install still exits 0. Without
+      # this job, a dropped pin looks exactly like a passing build.
+      - name: Audit for high/critical vulnerabilities
+        run: yarn npm audit --all --recursive --severity high
