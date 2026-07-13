@@ -9,8 +9,8 @@ jobs:
   backpressure:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v6
         with:
           node-version: 20
       - name: enable yarn
@@ -33,7 +33,7 @@ jobs:
       - name: dump server logs
         if: failure()
         run: docker compose logs stream-server redis > server-logs.txt
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: load-summary

@@ -1,0 +1,51 @@
+version: 2
+
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: '06:00'
+    open-pull-requests-limit: 5
+    groups:
+      # Angular releases in lockstep; a partial bump breaks the peer graph.
+      angular:
+        patterns:
+          - '@angular/*'
+          - '@angular-devkit/*'
+      # socket.io and its engine.io/ws transport chain are version-coupled.
+      socketio:
+        patterns:
+          - 'socket.io'
+          - 'socket.io-client'
+          - 'engine.io*'
+          - 'ws'
+      dev-dependencies:
+        dependency-type: development
+        update-types:
+          - minor
+          - patch
+      production:
+        dependency-type: production
+        update-types:
+          - minor
+          - patch
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: '06:00'
+    groups:
+      actions:
+        patterns:
+          - '*'
+
+  - package-ecosystem: docker
+    directory: /apps/stream-server
+    schedule:
+      interval: weekly
+      day: monday
+      time: '06:00'
