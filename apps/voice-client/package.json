@@ -14,7 +14,7 @@
     "@angular/compiler": "^21.2.18",
     "@angular/core": "^21.2.18",
     "@angular/forms": "^21.2.18",
-    "@angular/platform-browser": "^21.2.18",
+    "@angular/platform-browser": "^22.0.6",
     "@angular/platform-browser-dynamic": "^21.2.18",
     "@realtime-voice-infra/audio-codec": "workspace:*",
     "@realtime-voice-infra/session-core": "workspace:*",
