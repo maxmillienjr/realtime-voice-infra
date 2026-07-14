@@ -1,6 +1,6 @@
 FROM node:26-alpine AS builder
 WORKDIR /app
-RUN corepack enable
+RUN npm install -g corepack@latest && corepack enable
 COPY package.json yarn.lock* .yarnrc.yml* tsconfig.base.json ./
 COPY packages ./packages
 COPY apps/stream-server ./apps/stream-server
