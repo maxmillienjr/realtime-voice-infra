@@ -2077,7 +2077,7 @@ __metadata:
   resolution: "@realtime-voice-infra/session-core@workspace:packages/session-core"
   dependencies:
     "@realtime-voice-infra/shared-types": "workspace:*"
-    "@types/node": "npm:^20.12.0"
+    "@types/node": "npm:^20.19.43"
     jose: "npm:^5.2.4"
     typescript: "npm:^5.4.5"
     vitest: "npm:^3.2.7"
@@ -2101,7 +2101,7 @@ __metadata:
     "@realtime-voice-infra/audio-codec": "workspace:*"
     "@realtime-voice-infra/session-core": "workspace:*"
     "@realtime-voice-infra/shared-types": "workspace:*"
-    "@types/node": "npm:^20.12.0"
+    "@types/node": "npm:^20.19.43"
     fastify: "npm:^5.10.0"
     ioredis: "npm:^5.11.1"
     pino: "npm:^9.1.0"
@@ -2572,12 +2572,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:^20.12.0":
-  version: 20.19.39
-  resolution: "@types/node@npm:20.19.39"
+"@types/node@npm:^20.19.43":
+  version: 20.19.43
+  resolution: "@types/node@npm:20.19.43"
   dependencies:
     undici-types: "npm:~6.21.0"
-  checksum: 10c0/1d16da7b5f47a7415b827fcf3b94d279febf4c14671afec74a03e47856b5270023d9beb1b9aeab4d3b622fd97d61a60206cfc2cca588663181331bc592468289
+  checksum: 10c0/9bcec3b5295bdd77ff0b44a528a69f7e22028c347507ba2c69be47ec84e30299f45043b222e9c86c510e138c9c53b2419dd5cd34920602a4a5a381c288075318
   languageName: node
   linkType: hard
 
@@ -6003,7 +6003,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "realtime-voice-infra@workspace:."
   dependencies:
-    "@types/node": "npm:^20.12.0"
+    "@types/node": "npm:^20.19.43"
     "@typescript-eslint/eslint-plugin": "npm:^7.8.0"
     "@typescript-eslint/parser": "npm:^7.8.0"
     eslint: "npm:^8.57.0"
