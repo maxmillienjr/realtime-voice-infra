@@ -22,7 +22,7 @@
     "rxjs": "~7.8.0",
     "socket.io-client": "^4.7.5",
     "tslib": "^2.6.0",
-    "zone.js": "~0.14.0"
+    "zone.js": "~0.16.2"
   },
   "devDependencies": {
     "@angular/build": "^21.2.18",
