@@ -24,6 +24,7 @@ jobs:
           cache: yarn
       - run: yarn install --immutable
       - run: yarn lint
+      - run: yarn lint:docs
       - run: yarn build
       - run: yarn typecheck
       - run: yarn test

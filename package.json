@@ -16,6 +16,7 @@
     "build": "yarn workspaces foreach -Apt run build",
     "test": "yarn workspaces foreach -Apt run test",
     "lint": "eslint . --ext .ts,.tsx",
+    "lint:docs": "node scripts/lint-docs.mjs",
     "typecheck": "yarn workspaces foreach -Apt run typecheck",
     "format": "prettier --write ."
   },
