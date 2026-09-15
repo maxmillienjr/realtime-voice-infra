@@ -1,0 +1,276 @@
+#!/usr/bin/env node
+/**
+ * Structural lint for docs/prd, docs/adr and docs/STATUS.md.
+ *
+ * Context packs drift silently — this repo is the proof. Two files said "k6" for five
+ * months after the k6 script was deleted; a test file was cited by a name it never had;
+ * an e2e workflow implied browser coverage that never ran. Prose cannot be checked
+ * mechanically, but structure can, and structure is where drift shows up first: an id
+ * that resolves nowhere, a dependency that is not mutual, a status in the index that no
+ * longer matches the file, a file:line citation that points past the end of the file.
+ */
+import { readFileSync, readdirSync, existsSync } from 'node:fs';
+import { execFileSync } from 'node:child_process';
+import { join, dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const root = join(dirname(fileURLToPath(import.meta.url)), '..');
+const prdDir = join(root, 'docs', 'prd');
+const adrDir = join(root, 'docs', 'adr');
+
+const errors = [];
+const fail = (where, msg) => errors.push(`${where}: ${msg}`);
+
+const STATUSES = ['draft', 'accepted', 'in-progress', 'shipped', 'superseded'];
+const SIZES = ['S', 'M', 'L'];
+const REQUIRED = [
+  'id',
+  'title',
+  'tier',
+  'status',
+  'size',
+  'depends_on',
+  'blocks',
+  'issue',
+  'superseded_by',
+];
+const CAPABILITY_STATUSES = [
+  'implemented',
+  'stubbed',
+  'planned',
+  'broken',
+  'removed',
+  'unverified',
+];
+
+/** Minimal frontmatter reader. Handles scalars and inline arrays, which is all we use. */
+function frontmatter(text) {
+  const match = /^---\n([\s\S]*?)\n---/.exec(text);
+  if (!match) return null;
+  const out = {};
+  for (const line of match[1].split('\n')) {
+    if (!line.trim() || line.trimStart().startsWith('#')) continue;
+    const idx = line.indexOf(':');
+    if (idx === -1) continue;
+    const key = line.slice(0, idx).trim();
+    let raw = line.slice(idx + 1).trim();
+    raw = raw.replace(/\s+#.*$/, '').trim();
+    if (raw.startsWith('[') && raw.endsWith(']')) {
+      const inner = raw.slice(1, -1).trim();
+      out[key] = inner ? inner.split(',').map((s) => s.trim()) : [];
+    } else if (raw === 'null' || raw === '') {
+      out[key] = null;
+    } else {
+      out[key] = raw;
+    }
+  }
+  return out;
+}
+
+// --- PRD index is the registry of known ids -------------------------------
+const prdIndexPath = join(prdDir, 'README.md');
+if (!existsSync(prdIndexPath)) {
+  fail('docs/prd/README.md', 'missing — the index is the source of truth for the backlog');
+}
+const prdIndex = new Map();
+if (existsSync(prdIndexPath)) {
+  for (const line of readFileSync(prdIndexPath, 'utf-8').split('\n')) {
+    const row = /^\|\s*(?:\[([^\]]+)\]\([^)]+\)|([A-Z]\d-[A-Z]))\s*\|(.+)\|\s*$/.exec(line);
+    if (!row) continue;
+    const id = row[1] ?? row[2];
+    const cells = row[3].split('|').map((c) => c.trim());
+    prdIndex.set(id, { status: cells[cells.length - 1], size: cells[cells.length - 2] });
+  }
+  if (prdIndex.size === 0) fail('docs/prd/README.md', 'no PRD rows parsed from the index tables');
+}
+
+// --- Each PRD file -------------------------------------------------------
+const files = existsSync(prdDir)
+  ? readdirSync(prdDir).filter((f) => f.endsWith('.md') && !f.startsWith('_') && f !== 'README.md')
+  : [];
+const byId = new Map();
+
+for (const file of files) {
+  const where = `docs/prd/${file}`;
+  const body = readFileSync(join(prdDir, file), 'utf-8');
+  const fm = frontmatter(body);
+  if (!fm) {
+    fail(where, 'no YAML frontmatter block');
+    continue;
+  }
+  for (const key of REQUIRED) {
+    if (!(key in fm)) fail(where, `frontmatter is missing \`${key}\``);
+  }
+  if (fm.status && !STATUSES.includes(fm.status))
+    fail(where, `status \`${fm.status}\` is not one of ${STATUSES.join(', ')}`);
+  if (fm.size && !SIZES.includes(fm.size))
+    fail(where, `size \`${fm.size}\` is not one of ${SIZES.join(', ')}`);
+  if (fm.id && !file.startsWith(`${fm.id}-`))
+    fail(where, `filename does not start with its id \`${fm.id}\``);
+  if (fm.id && !prdIndex.has(fm.id)) fail(where, `id \`${fm.id}\` is not listed in the index`);
+  if (fm.id && prdIndex.has(fm.id)) {
+    const row = prdIndex.get(fm.id);
+    if (row.status !== fm.status)
+      fail(where, `status \`${fm.status}\` disagrees with the index, which says \`${row.status}\``);
+    if (row.size !== fm.size)
+      fail(where, `size \`${fm.size}\` disagrees with the index, which says \`${row.size}\``);
+  }
+  if (fm.status === 'in-progress' && !fm.issue)
+    fail(where, 'status is `in-progress` but no issue is recorded');
+  if (fm.status === 'superseded' && !fm.superseded_by)
+    fail(where, 'status is `superseded` but `superseded_by` is empty');
+
+  // A shipped PRD may still carry unmet criteria — but each one must name the PRD that
+  // now owns it. The naive rule (shipped implies zero unchecked boxes) is worse than
+  // useless: it pressures the author to tick a box and append a caveat, which is exactly
+  // how `shipped` stops meaning anything.
+  if (fm.status === 'shipped') {
+    const section = /## Acceptance criteria\n([\s\S]*?)(?=\n## )/.exec(body);
+    if (section) {
+      for (const item of section[1].split(/\n(?=- \[)/)) {
+        if (!item.trim().startsWith('- [ ]')) continue;
+        if (!/\bP\d-[A-Z]\b/.test(item))
+          fail(
+            where,
+            'is shipped with an unmet criterion that names no owning PRD: ' +
+              `"${item.replace(/\s+/g, ' ').slice(6, 76).trim()}…"`,
+          );
+      }
+    }
+  }
+  if (fm.id) byId.set(fm.id, { fm, where });
+}
+
+// --- Referential integrity ------------------------------------------------
+for (const [id, { fm, where }] of byId) {
+  for (const key of ['depends_on', 'blocks']) {
+    for (const ref of fm[key] ?? []) {
+      if (!prdIndex.has(ref))
+        fail(where, `${key} references \`${ref}\`, which is not in the index`);
+    }
+  }
+  // Symmetry, checkable only where both files exist.
+  for (const ref of fm.blocks ?? []) {
+    const other = byId.get(ref);
+    if (other && !(other.fm.depends_on ?? []).includes(id))
+      fail(where, `blocks \`${ref}\`, but ${ref} does not list \`${id}\` in depends_on`);
+  }
+  for (const ref of fm.depends_on ?? []) {
+    const other = byId.get(ref);
+    if (other && !(other.fm.blocks ?? []).includes(id))
+      fail(where, `depends_on \`${ref}\`, but ${ref} does not list \`${id}\` in blocks`);
+  }
+  if (fm.superseded_by && !prdIndex.has(fm.superseded_by))
+    fail(where, `superseded_by references \`${fm.superseded_by}\`, which is not in the index`);
+}
+
+// --- ADRs -----------------------------------------------------------------
+const adrIndexPath = join(adrDir, 'README.md');
+if (existsSync(adrIndexPath)) {
+  const indexed = new Set();
+  for (const line of readFileSync(adrIndexPath, 'utf-8').split('\n')) {
+    const row = /^\|\s*\[(\d{4})\]\(([^)]+)\)\s*\|/.exec(line);
+    if (!row) continue;
+    indexed.add(row[2]);
+    if (!existsSync(join(adrDir, row[2])))
+      fail('docs/adr/README.md', `index lists \`${row[2]}\`, which does not exist`);
+  }
+  for (const file of readdirSync(adrDir).filter((f) => /^\d{4}-.*\.md$/.test(f))) {
+    if (!indexed.has(file)) fail(`docs/adr/${file}`, 'exists but is not listed in the ADR index');
+    const text = readFileSync(join(adrDir, file), 'utf-8');
+    if (!/^\*\*Status:\*\*\s*(\S+)/m.test(text))
+      fail(`docs/adr/${file}`, 'has no **Status:** line');
+  }
+} else {
+  fail('docs/adr/README.md', 'missing');
+}
+
+// --- docs/STATUS.md -------------------------------------------------------
+// Every row cites `path:NN` or `path:NN-MM`. Those citations are the whole value of the
+// matrix, and they rot silently when a file is renamed or shrinks. Resolve each one
+// against `git ls-files` and range-check the line, so a stale citation fails the build
+// instead of misleading a reader. Extensions are whitelisted so that `localhost:3000`
+// and `redis://redis:6379` are not mistaken for citations; the extensionless surfaces
+// this repo actually cites (Dockerfile, .nvmrc, .gitignore) are named explicitly.
+const statusPath = join(root, 'docs', 'STATUS.md');
+if (existsSync(statusPath)) {
+  const statusText = readFileSync(statusPath, 'utf-8');
+  const tracked = execFileSync('git', ['ls-files'], { cwd: root, encoding: 'utf-8' })
+    .split('\n')
+    .filter(Boolean);
+  const seen = new Set();
+  const citation =
+    /`((?:[A-Za-z0-9._/-]+\.(?:ts|tsx|mjs|cjs|js|yml|yaml|json|md|example)|(?:[A-Za-z0-9._/-]+\/)?Dockerfile|\.nvmrc|\.gitignore)):(\d+)(?:-(\d+))?`/g;
+  for (const [, relPath, startStr, endStr] of statusText.matchAll(citation)) {
+    const key = `${relPath}:${startStr}-${endStr ?? ''}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    // An exact path wins outright; only a bare filename falls back to suffix matching,
+    // so `package.json` means the root manifest and not every workspace's.
+    let matches = tracked.filter((f) => f === relPath);
+    if (matches.length === 0) matches = tracked.filter((f) => f.endsWith(`/${relPath}`));
+    if (matches.length === 0) {
+      fail('docs/STATUS.md', `cites \`${relPath}\`, which no tracked file matches`);
+      continue;
+    }
+    if (matches.length > 1) {
+      fail(
+        'docs/STATUS.md',
+        `cites \`${relPath}\`, which is ambiguous (${matches.map((m) => m).join(', ')})`,
+      );
+      continue;
+    }
+    const lines = readFileSync(join(root, matches[0]), 'utf-8').split('\n').length;
+    const last = Number(endStr ?? startStr);
+    if (last > lines)
+      fail(
+        'docs/STATUS.md',
+        `cites \`${relPath}:${startStr}${endStr ? `-${endStr}` : ''}\` but ${matches[0]} has ${lines} lines`,
+      );
+  }
+
+  // Every matrix row's status is one of the documented values, and every owner it names
+  // is an id the PRD index knows about.
+  for (const line of statusText.split('\n')) {
+    const row = /^\|\s*(\d+)\s*\|(.+)\|\s*$/.exec(line);
+    if (!row) continue;
+    const cells = row[2].split('|').map((c) => c.trim());
+    if (cells.length < 4) continue;
+    const status = cells[1].replace(/`/g, '');
+    if (!CAPABILITY_STATUSES.includes(status))
+      fail(
+        'docs/STATUS.md',
+        `row ${row[1]} has status \`${status}\`, not one of ${CAPABILITY_STATUSES.join(', ')}`,
+      );
+    for (const owner of cells[cells.length - 1].match(/\bP\d-[A-Z]\b/g) ?? []) {
+      if (!prdIndex.has(owner))
+        fail(
+          'docs/STATUS.md',
+          `row ${row[1]} names owner \`${owner}\`, which is not in the PRD index`,
+        );
+    }
+  }
+} else {
+  fail('docs/STATUS.md', 'missing');
+}
+
+// --- Node major -------------------------------------------------------------
+// Not checked yet, on purpose. The surfaces disagree today — `.nvmrc` says 20, `ci.yml`
+// runs 20 and 22, `security.yml` runs 24, `apps/stream-server/Dockerfile` is node:26 —
+// and a lint that fails on every run until someone picks a major is a lint people learn
+// to ignore. P0-B picks the major, moves every surface (.nvmrc, the `node:` matrix and
+// every `node-version:` in .github/workflows, `FROM node:` in apps/*/Dockerfile,
+// `engines.node` in package.json, and the prose in CLAUDE.md), and then adds the check
+// here so a Dependabot base-image bump cannot move one surface alone again.
+// `docs/STATUS.md` carries the drift until then.
+
+// --- Report ---------------------------------------------------------------
+if (errors.length) {
+  console.error(`\ndocs lint failed with ${errors.length} problem(s):\n`);
+  for (const e of errors) console.error(`  ✗ ${e}`);
+  console.error('');
+  process.exit(1);
+}
+console.log(
+  `docs lint passed: ${byId.size} PRD file(s), ${prdIndex.size} indexed, ADR index consistent, STATUS citations resolve.`,
+);
