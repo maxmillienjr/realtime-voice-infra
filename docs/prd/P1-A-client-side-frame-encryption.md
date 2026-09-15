@@ -54,7 +54,7 @@ proxy, while an AEAD frame under a per-session key (RFC 5116 §2; AES-256-GCM pe
 fan-out — until the process that holds the derived key opens it, and binds each frame to its
 session and sequence through the nonce construction in ADR 0002. The W3C Web Cryptography API
 provides exactly the three primitives `session-core` uses (`SubtleCrypto.digest` for the
-fingerprint, `deriveBits` with HKDF for the frame key, `encrypt` with AES-GCM for the frame),
+fingerprint, `deriveKey` with HKDF for the frame key, `encrypt` with AES-GCM for the frame),
 so the browser can produce byte-identical envelopes without a dependency. The practice this
 PRD restores is that the code path tests exercise is the code path production takes: today
 the tested encryptor is a Node script and the shipped one is a comment.

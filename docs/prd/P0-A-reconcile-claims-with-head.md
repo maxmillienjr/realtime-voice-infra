@@ -68,6 +68,10 @@ matrix in `docs/STATUS.md` carries the runtime evidence.
     the default profile; `docker-compose.yml:37-40` also defines an `adminer` service, a SQL
     administration UI, in a repository with no SQL store. Removing it is P0-B's; saying what
     the compose file contains is this PRD's.
+12. `.context/architecture.md:12` budgets "AES-256-GCM encrypt (12 B IV + 320 B PCM)". A
+    frame is 320 _samples_: 1280 B as Float32 (`.context/architecture.md:19`) and 640 B on
+    the wire as PCM16 (`load-backpressure.ts:48`). Nothing in this pipeline encrypts 320
+    bytes.
 
 ## Why it matters
 
@@ -100,7 +104,8 @@ correction can point at the row and the line.
 - `.context/crypto.md`: restate the replay paragraph as what the router does (first replayed
   frame flagged, `expectedSequence` resynced to it), pointing at P4-A.
 - `.context/architecture.md`: mark the timing budget row for Opus as a target while the codec
-  is pass-through (P6-C); leave the resumption paragraph, which is already honest.
+  is pass-through (P6-C); correct the frame size in the AES-GCM budget row; leave the
+  resumption paragraph, which is already honest.
 - `CLAUDE.md`: layout line for `stream-server` names the major P0-B picks; the `audio-codec`
   line already says "WASM integration pending" and stays.
 - `apps/voice-client/package.json`: the `test` script says what is true (`echo 'no unit tests
