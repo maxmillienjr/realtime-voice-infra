@@ -38,8 +38,9 @@ is aspirational it names the PRD that makes it real.
 ## Formatting
 
 - Prettier, configured in `.prettierrc` (single quotes, trailing commas, width 100). `yarn format`
-  writes; there is no `format:check` and no CI step yet, and four tracked markdown files fail
-  `prettier --check` at HEAD (`docs/STATUS.md` row 27). Until P0-B adds the gate, run
+  writes; there is no `format:check` and no CI step yet, and 20 tracked files fail
+  `prettier --check` at HEAD — markdown, config and TypeScript sources alike, most of them
+  cited by line in `docs/STATUS.md` (row 27). Until P0-B adds the gate, run
   `npx prettier --check` on every file you touch.
 
 ## Testing

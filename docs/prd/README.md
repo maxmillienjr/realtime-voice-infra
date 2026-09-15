@@ -43,8 +43,8 @@ router resyncs `expectedSequence` to any received value, so after frames 0–9 a
 clients streaming, the server exited 17 ms after SIGTERM (P3-B).
 
 **`docs/STATUS.md` is the authority on any capability sentence, including the ones above.**
-Thirty-one rows, each with a status, a file and a line — fifteen `implemented`, five
-`stubbed`, six `planned`, three `broken`, two `unverified`, none `removed`. The rule that
+Thirty-one rows, each with a status, a file and a line — fourteen `implemented`, four
+`stubbed`, six `planned`, four `broken`, three `unverified`, none `removed`. The rule that
 keeps it true is in `.context/conventions.md`: a change that moves a row moves it there in the
 same pull request. `yarn lint:docs` fails CI when a PRD's status disagrees with its index row,
 when a STATUS citation no longer resolves, or when a STATUS owner names a PRD the index does
