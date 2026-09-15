@@ -35,12 +35,13 @@ exceeds one frame against a 256 KB threshold. A 1000-frame, 672 KB in-process bu
 1000 acks and 0 pauses; the 2026-09-14 load run reports `pauses=0 resumes=0`. The tracker is
 correct and unreachable. P1-B owns giving the server something to be slow at.
 
-**Two sentences in `.context/` are falsified at runtime, not merely unbacked.**
+**Two documented guarantees are falsified at runtime, not merely unbacked.**
 `.context/crypto.md:38-39` says in-session replay is detected by the monotonic sequence; the
 router resyncs `expectedSequence` to any received value, so after frames 0–9 a replayed frame
 3 is flagged and replayed frames 4 and 5 are decrypted and acked under reused IVs (P4-A).
-`SHUTDOWN_GRACE_MS` bounds an `io.close()` that disconnects every client at once: with five
-clients streaming, the server exited 17 ms after SIGTERM (P3-B).
+`SHUTDOWN_GRACE_MS` bounds an `io.close()` that disconnects every client at once, with no
+drain step for the grace period to cover: with five clients streaming, the server exited
+17 ms after SIGTERM, losing the frame in flight (P3-B).
 
 **`docs/STATUS.md` is the authority on any capability sentence, including the ones above.**
 Thirty-one rows, each with a status, a file and a line — fourteen `implemented`, four
