@@ -194,7 +194,7 @@ from the read loop to `enqueue` so a `voice.pause` stops encryption, not just em
       Node simulation of the client loop emits frames in sequence order and the server
       returns no `SEQUENCE_GAP` (server half).
 - [ ] The load runner obtains its key from `/session/init` only; `git grep ioredis --
-  apps/stream-server/scripts` returns nothing; a run at 10 VUs × 10 s against the compose
+apps/stream-server/scripts` returns nothing; a run at 10 VUs × 10 s against the compose
       stack reports `ack_ratio >= 0.95` and `errors={}`.
 - [ ] In a browser with a fake microphone, the frame counter increments and no `voice.error`
       arrives for 10 seconds of synthetic tone (browser half). **Not tickable from Node.**
