@@ -161,9 +161,13 @@ in-process server as `integration.test.ts`.
 
 ## Acceptance criteria
 
-- [ ] `git grep -n k6 -- ':!docs/adr' ':!docs/prd' ':!docs/STATUS.md'` returns nothing.
-- [ ] `git grep -n 'BackpressureTracker.test.ts'` and
-      `git grep -n BACKPRESSURE_RESUME_THRESHOLD` return nothing.
+- [ ] `git grep -n k6 -- AGENTS.md .agents/audio-reviewer.md` returns nothing. The k6
+      mentions in `.agents/prd-author.md`, `.context/conventions.md` and
+      `scripts/lint-docs.mjs` are history rather than instructions and stay.
+- [ ] `git grep -n 'BackpressureTracker.test.ts' -- .context` and
+      `git grep -n BACKPRESSURE_RESUME_THRESHOLD -- .context apps packages` return nothing.
+      Both names survive under `docs/` on purpose: that is where the record of the
+      correction lives.
 - [ ] `git grep -n 'voice.tts' -- README.md` returns nothing, or the only hit is a line that
       also contains `P6-A`.
 - [ ] `README.md` contains no present-tense sentence stating that the client encrypts, encodes
