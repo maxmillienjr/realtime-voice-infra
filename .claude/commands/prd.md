@@ -85,8 +85,9 @@ command for both, and someone who expected code needs to know why they are readi
    another PRD may have closed some since.
 4. Work in small commits with real messages, following `.context/conventions.md`. Route
    crypto, buffer-size and backpressure changes through `.agents/audio-reviewer.md`.
-5. Run `yarn typecheck`, `yarn lint`, `yarn test`, `yarn lint:docs`, and
-   `npx prettier --check` on every file you touched before calling it done.
+5. Run `yarn lint`, `yarn lint:docs`, `yarn build`, `yarn typecheck`, `yarn test`, and
+   `npx prettier --check` on every file you touched before calling it done. `build` precedes
+   `typecheck` and `test`: workspaces resolve each other through `dist/`.
 6. Walk the acceptance criteria one by one and say which are met, and on which half of the
    system each was checked. If one is not, say so plainly rather than reporting the task
    complete.

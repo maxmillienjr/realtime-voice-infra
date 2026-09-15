@@ -44,5 +44,7 @@ repo claim at HEAD, keep the index row and the frontmatter in agreement, and run
 
 ## Gates
 
-`yarn typecheck`, `yarn lint`, `yarn test`, `yarn lint:docs`. All four run in `ci.yml`. There is
-no formatting gate yet (P0-B); run `npx prettier --check` on every file you touch.
+`yarn lint`, `yarn lint:docs`, `yarn build`, `yarn typecheck`, `yarn test`, in that order — it is
+`ci.yml`'s, and `build` comes before `typecheck` and `test` because workspaces resolve each
+other through `dist/`. All five run in `ci.yml`. There is no formatting gate yet (P0-B); run
+`npx prettier --check` on every file you touch.

@@ -44,8 +44,10 @@ See `.context/architecture.md`, `.context/backpressure.md`, `.context/crypto.md`
 
 ## Gates
 
-Run `yarn typecheck`, `yarn lint`, `yarn test`, and `yarn lint:docs` before declaring any
-task complete. All four gate CI. There is no `format:check` yet (P0-B owns it); run
+Run `yarn lint`, `yarn lint:docs`, `yarn build`, `yarn typecheck`, `yarn test` — `ci.yml`'s
+order — before declaring any task complete. All five gate CI. `yarn build` is not optional:
+workspaces resolve each other through `dist/`, so `typecheck` and `test` fail with `TS2307`
+on a tree that has not been built. There is no `format:check` yet (P0-B owns it); run
 `npx prettier --check` on every file you touch.
 
 ## What is actually true

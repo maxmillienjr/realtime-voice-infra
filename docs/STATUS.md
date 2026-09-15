@@ -94,7 +94,8 @@ owns giving the server something to be slow at.
 
 Two documented guarantees are falsified by a probe rather than merely unbacked: replay
 detection rewinds (row 10) and the shutdown grace period drains nothing (row 15). Both have
-small fixes and their own PRDs. Row 26 is the one row an automated check should own, and does not yet.
+small fixes and their own PRDs. Row 26 is the one row an automated check should own, and
+does not yet.
 
 Rows 2, 14 and 28 carry no owner because they are true, and rows 5, 7, 8, 9, 16, 24, 25, 29
 carry none because they are done. Inventing a PRD id for a working thing would put backlog
