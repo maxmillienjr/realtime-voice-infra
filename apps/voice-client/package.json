@@ -20,7 +20,7 @@
     "@realtime-voice-infra/session-core": "workspace:*",
     "@realtime-voice-infra/shared-types": "workspace:*",
     "rxjs": "~7.8.0",
-    "socket.io-client": "^4.7.5",
+    "socket.io-client": "^4.8.4",
     "tslib": "^2.6.0",
     "zone.js": "~0.16.2"
   },
