@@ -10,19 +10,19 @@
   },
   "dependencies": {
     "@angular/animations": "^21.2.19",
-    "@angular/common": "^21.2.22",
-    "@angular/compiler": "^21.2.22",
-    "@angular/core": "^21.2.22",
-    "@angular/forms": "^21.2.22",
-    "@angular/platform-browser": "^21.2.22",
+    "@angular/common": "^21.2.25",
+    "@angular/compiler": "^21.2.25",
+    "@angular/core": "^21.2.25",
+    "@angular/forms": "^21.2.25",
+    "@angular/platform-browser": "^21.2.25",
     "@angular/platform-browser-dynamic": "^21.2.19",
     "@realtime-voice-infra/audio-codec": "workspace:*",
     "@realtime-voice-infra/session-core": "workspace:*",
     "@realtime-voice-infra/shared-types": "workspace:*",
     "rxjs": "~7.8.0",
-    "socket.io-client": "^4.7.5",
+    "socket.io-client": "^4.8.4",
     "tslib": "^2.6.0",
-    "zone.js": "~0.16.2"
+    "zone.js": "~0.16.3"
   },
   "devDependencies": {
     "@angular/build": "^21.2.22",
